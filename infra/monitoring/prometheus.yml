@@ -1,0 +1,26 @@
+# KiteEdge Prometheus configuration
+# Scrapes metrics from all services exposing /metrics.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "gateway"
+    static_configs:
+      - targets: ["gateway:4000"]
+    metrics_path: /metrics
+
+  - job_name: "analytics_engine"
+    static_configs:
+      - targets: ["analytics_engine:8001"]
+    metrics_path: /metrics
+
+  - job_name: "data_pipeline"
+    static_configs:
+      - targets: ["data_pipeline:9100"]
+    metrics_path: /metrics
+
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

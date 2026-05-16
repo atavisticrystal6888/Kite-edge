@@ -1,5 +1,7 @@
 # KiteEdge – API & Methodology Reference (T199)
 
+> **Note:** For the full developer documentation including architecture, setup, testing, and deployment, see [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md).
+
 ## 1 Authentication
 
 | Endpoint | Method | Description |

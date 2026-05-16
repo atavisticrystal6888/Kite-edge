@@ -1,5 +1,7 @@
 # KiteEdge – User Guide (T200)
 
+> **Note:** This is the quick-start summary. For the full comprehensive guide, see [USER_GUIDE_COMPLETE.md](USER_GUIDE_COMPLETE.md).
+
 ## Quick Start
 
 ### Prerequisites
