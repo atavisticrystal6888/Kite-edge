@@ -22,13 +22,11 @@ class PortfolioForecastRequest(BaseModel):
     seed: int | None = None
 
 
-@router.post("/{symbol}")
-async def instrument_forecast(symbol: str, req: ForecastRequest):
+@router.post("/portfolio")
+async def portfolio_forecast(req: PortfolioForecastRequest):
     return {
-        "instrument": {"symbol": symbol, "exchange": req.exchange},
-        "forecasts": [],
-        "accuracy_metrics": {},
-        "signals": [],
+        "portfolio_forecasts": [],
+        "distribution_summary": {},
         "disclaimers": [
             "Forecasts are statistical projections, not recommendations.",
             "Past performance does not predict future results.",
@@ -36,11 +34,13 @@ async def instrument_forecast(symbol: str, req: ForecastRequest):
     }
 
 
-@router.post("/portfolio")
-async def portfolio_forecast(req: PortfolioForecastRequest):
+@router.post("/{symbol}")
+async def instrument_forecast(symbol: str, req: ForecastRequest):
     return {
-        "portfolio_forecasts": [],
-        "distribution_summary": {},
+        "instrument": {"symbol": symbol, "exchange": req.exchange},
+        "forecasts": [],
+        "accuracy_metrics": {},
+        "signals": [],
         "disclaimers": [
             "Forecasts are statistical projections, not recommendations.",
             "Past performance does not predict future results.",

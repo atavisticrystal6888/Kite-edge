@@ -29,7 +29,7 @@ defmodule KiteEdgeWeb.HealthMetricsController do
 
   defp check_redis do
     case KiteEdge.Kite.SessionStore.fetch("__health_check__") do
-      {:error, :not_found} -> :ok
+      :error -> :ok
       {:ok, _} -> :ok
       _ -> :error
     end

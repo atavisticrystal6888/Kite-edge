@@ -127,8 +127,8 @@ def compute_returns(df: pd.DataFrame, _params: dict | None = None) -> list[dict]
     """Daily, weekly, monthly returns."""
     close = df["close"]
     daily = close.pct_change().iloc[-1] * 100 if len(close) > 1 else 0.0
-    weekly = ((close.iloc[-1] / close.iloc[-5]) - 1) * 100 if len(close) >= 5 else 0.0
-    monthly = ((close.iloc[-1] / close.iloc[-21]) - 1) * 100 if len(close) >= 21 else 0.0
+    weekly = ((close.iloc[-1] / close.iloc[-5]) - 1) * 100 if len(close) >= 5 and close.iloc[-5] != 0 else 0.0
+    monthly = ((close.iloc[-1] / close.iloc[-21]) - 1) * 100 if len(close) >= 21 and close.iloc[-21] != 0 else 0.0
     return [
         _ind("Daily_Return", daily, None),
         _ind("Weekly_Return", weekly, None),

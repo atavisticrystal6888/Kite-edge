@@ -2,7 +2,7 @@
  * T080: Indicator configuration panel.
  */
 import { useIndicatorProfile, useUpdateProfile, useResetProfile } from '@/hooks/useSettings'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export function IndicatorConfigPanel() {
   const { data: profile } = useIndicatorProfile()
@@ -10,6 +10,12 @@ export function IndicatorConfigPanel() {
   const reset = useResetProfile()
   const [editing, setEditing] = useState(false)
   const [params, setParams] = useState<Record<string, unknown>>({})
+
+  useEffect(() => {
+    if (profile?.parameters) {
+      setParams(profile.parameters)
+    }
+  }, [profile?.parameters])
 
   const handleSave = () => {
     update.mutate({ parameters: params })

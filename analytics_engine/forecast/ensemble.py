@@ -21,13 +21,18 @@ def combine(
     w = np.array(weights or [1.0 / n_models] * n_models)
     w = w / w.sum()
 
-    horizon = len(forecasts[0]["forecasts"])
+    horizon = max(len(f["forecasts"]) for f in forecasts)
     combined: list[dict] = []
     for i in range(horizon):
-        vals = [f["forecasts"][i] for f in forecasts if i < len(f["forecasts"])]
-        pred = sum(w[j] * vals[j]["predicted"] for j in range(len(vals)))
-        lo = sum(w[j] * vals[j]["lower"] for j in range(len(vals)))
-        hi = sum(w[j] * vals[j]["upper"] for j in range(len(vals)))
+        available = [(j, f["forecasts"][i]) for j, f in enumerate(forecasts) if i < len(f["forecasts"])]
+        if not available:
+            continue
+        w_sub = np.array([w[j] for j, _ in available])
+        w_sub = w_sub / w_sub.sum()  # re-normalize weights for available models
+        vals = [v for _, v in available]
+        pred = sum(w_sub[k] * vals[k]["predicted"] for k in range(len(vals)))
+        lo = sum(w_sub[k] * vals[k]["lower"] for k in range(len(vals)))
+        hi = sum(w_sub[k] * vals[k]["upper"] for k in range(len(vals)))
         combined.append({
             "date": vals[0]["date"],
             "predicted": round(float(pred), 2),

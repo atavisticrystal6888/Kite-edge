@@ -67,7 +67,7 @@ def summary_metrics(matched: list[MatchedTrade]) -> dict:
         "max_win_streak": max_win_streak,
         "max_loss_streak": max_loss_streak,
         "current_streak": current_streak,
-        "profit_factor": round(sum(wins) / abs(sum(losses)), 2) if losses and sum(losses) != 0 else None,
+        "profit_factor": round(sum(wins) / abs(sum(losses)), 2) if losses and abs(sum(losses)) > 1e-10 else None,
     }
 
 

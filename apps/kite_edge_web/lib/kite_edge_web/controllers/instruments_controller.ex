@@ -5,9 +5,13 @@ defmodule KiteEdgeWeb.InstrumentsController do
   alias KiteEdge.Market.InstrumentQuery
 
   def search(conn, %{"query" => q} = params) do
+    limit = case Integer.parse(params["limit"] || "20") do
+      {n, _} when n > 0 and n <= 100 -> n
+      _ -> 20
+    end
     results = InstrumentQuery.search(q,
       exchange: params["exchange"],
-      limit: String.to_integer(params["limit"] || "20")
+      limit: limit
     )
     json(conn, %{results: results})
   end

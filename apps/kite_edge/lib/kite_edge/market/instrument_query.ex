@@ -9,9 +9,11 @@ defmodule KiteEdge.Market.InstrumentQuery do
     exchange = Keyword.get(opts, :exchange)
     limit = min(Keyword.get(opts, :limit, 20), 100)
 
+    escaped = query |> String.replace("\\", "\\\\") |> String.replace("%", "\\%") |> String.replace("_", "\\_")
+
     q =
       from(i in InstrumentMaster,
-        where: ilike(i.tradingsymbol, ^"%#{query}%"),
+        where: ilike(i.tradingsymbol, ^"%#{escaped}%"),
         limit: ^limit,
         order_by: [asc: i.tradingsymbol]
       )

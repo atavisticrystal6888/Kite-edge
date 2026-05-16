@@ -34,9 +34,7 @@ config :kite_edge, Oban,
        # Every market day pre-open: refresh instrument master.
        {"15 3 * * 1-5", KiteEdge.Sync.InstrumentMasterSync},
        # Nightly historical candle backfill sweep (IST ~ 00:30).
-       {"0 19 * * *", KiteEdge.Sync.HistoricalBackfill},
-       # Nightly forecast retrain handoff to Python pipeline.
-       {"30 19 * * *", KiteEdge.Analytics.ForecastRetrainTrigger}
+       {"0 19 * * *", KiteEdge.Sync.HistoricalBackfill}
      ]}
   ]
 

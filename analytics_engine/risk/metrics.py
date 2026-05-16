@@ -12,17 +12,21 @@ import pandas as pd
 
 def sharpe_ratio(returns: pd.Series, rf: float = 0.0, periods: int = 252) -> float:
     excess = returns - rf / periods
-    if excess.std() == 0:
+    std = excess.std()
+    if std < 1e-12:
         return 0.0
-    return float(np.sqrt(periods) * excess.mean() / excess.std())
+    return float(np.sqrt(periods) * excess.mean() / std)
 
 
 def sortino_ratio(returns: pd.Series, rf: float = 0.0, periods: int = 252) -> float:
     excess = returns - rf / periods
     downside = excess[excess < 0]
-    if len(downside) == 0 or downside.std() == 0:
+    if len(downside) == 0:
         return 0.0
-    return float(np.sqrt(periods) * excess.mean() / downside.std())
+    ds_std = downside.std()
+    if ds_std < 1e-12:
+        return 0.0
+    return float(np.sqrt(periods) * excess.mean() / ds_std)
 
 
 def calmar_ratio(returns: pd.Series, periods: int = 252) -> float:
@@ -35,14 +39,15 @@ def calmar_ratio(returns: pd.Series, periods: int = 252) -> float:
 
 def information_ratio(returns: pd.Series, benchmark: pd.Series, periods: int = 252) -> float:
     diff = returns - benchmark
-    if diff.std() == 0:
+    std = diff.std()
+    if std < 1e-12:
         return 0.0
-    return float(np.sqrt(periods) * diff.mean() / diff.std())
+    return float(np.sqrt(periods) * diff.mean() / std)
 
 
 def treynor_ratio(returns: pd.Series, benchmark: pd.Series, rf: float = 0.0, periods: int = 252) -> float:
     b = beta(returns, benchmark)
-    if b == 0:
+    if abs(b) < 1e-12:
         return 0.0
     ann_excess = (returns.mean() - rf / periods) * periods
     return float(ann_excess / b)
@@ -52,9 +57,10 @@ def treynor_ratio(returns: pd.Series, benchmark: pd.Series, rf: float = 0.0, per
 
 def beta(returns: pd.Series, benchmark: pd.Series) -> float:
     aligned = pd.concat([returns, benchmark], axis=1).dropna()
-    if len(aligned) < 2 or aligned.iloc[:, 1].var() == 0:
+    bm_var = aligned.iloc[:, 1].var() if len(aligned) >= 2 else 0.0
+    if len(aligned) < 2 or bm_var < 1e-12:
         return 0.0
-    return float(aligned.iloc[:, 0].cov(aligned.iloc[:, 1]) / aligned.iloc[:, 1].var())
+    return float(aligned.iloc[:, 0].cov(aligned.iloc[:, 1]) / bm_var)
 
 
 def alpha(returns: pd.Series, benchmark: pd.Series, rf: float = 0.0, periods: int = 252) -> float:

@@ -12,7 +12,7 @@ defmodule KiteEdge.Kite.Client do
   Access tokens are NEVER stored server-side outside
   `KiteEdge.Kite.SessionStore` (Principle 7).
   """
-  use Tesla, only: [:get, :post, :delete]
+  use Tesla, only: []
 
   alias KiteEdge.Kite.{RateLimiter, RequestPipeline}
 
@@ -29,7 +29,7 @@ defmodule KiteEdge.Kite.Client do
 
       headers = auth_headers(opts)
 
-      case __MODULE__.get(path, headers: headers) do
+      case Tesla.get(__MODULE__, path, headers: headers) do
         {:ok, %Tesla.Env{status: 200, body: body}} ->
           {:ok, body}
 
@@ -48,12 +48,31 @@ defmodule KiteEdge.Kite.Client do
     end)
   end
 
+  @spec post(String.t(), map() | keyword(), keyword()) :: {:ok, map()} | {:error, term()}
+  def post(path, body, opts) when is_binary(path) and is_list(opts) do
+    RequestPipeline.run(fn ->
+      :ok = RateLimiter.acquire()
+      headers = auth_headers(opts)
+
+      case Tesla.post(__MODULE__, path, body, headers: headers) do
+        {:ok, %Tesla.Env{status: status, body: resp_body}} when status in 200..299 ->
+          {:ok, resp_body}
+
+        {:ok, %Tesla.Env{status: status, body: resp_body}} ->
+          {:error, {:kite, kite_reason(resp_body, status)}}
+
+        {:error, reason} ->
+          {:error, reason}
+      end
+    end)
+  end
+
   defp auth_headers(opts) do
     api_key = Application.get_env(:kite_edge, :kite_api_key, System.get_env("KITE_API_KEY", ""))
     token = Keyword.fetch!(opts, :access_token)
     [{"authorization", "token #{api_key}:#{token}"}]
   end
 
-  defp kite_reason(%{"error_type" => t}, _), do: String.to_atom(Macro.underscore(t))
+  defp kite_reason(%{"error_type" => t}, _), do: String.to_existing_atom(Macro.underscore(t))
   defp kite_reason(_, status), do: {:http, status}
 end

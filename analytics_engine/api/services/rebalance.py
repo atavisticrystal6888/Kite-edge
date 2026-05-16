@@ -12,8 +12,10 @@ def rebalance(
     custom_targets: dict[str, float] | None = None,
 ) -> dict:
     """T158: Compute allocation gaps and recommended rebalance actions."""
-    total_value = sum(float(h.get("current_value", 0)) for h in holdings) or 1.0
+    total_value = sum(float(h.get("current_value", 0) or 0) for h in holdings) or 1.0
     n = len(holdings)
+    if n == 0:
+        return {"current_allocation": {}, "target_allocation": {}, "recommended_actions": [], "disclaimers": ["No holdings to rebalance."]}
 
     if target_model == "equal_weight":
         targets = {h.get("symbol", h.get("tradingsymbol", "")): 1.0 / n for h in holdings}

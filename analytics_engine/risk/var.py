@@ -10,9 +10,11 @@ import pandas as pd
 def historical_var(returns: pd.Series, confidence: float = 0.95) -> dict:
     """T095: Historical VaR and Expected Shortfall (CVaR)."""
     sorted_r = returns.dropna().sort_values()
-    idx = int((1 - confidence) * len(sorted_r))
-    var_val = float(sorted_r.iloc[max(idx, 0)])
-    es = float(sorted_r.iloc[: max(idx, 1)].mean())
+    if len(sorted_r) == 0:
+        return {"var": 0.0, "expected_shortfall": 0.0, "method": "historical"}
+    idx = max(int(np.floor((1 - confidence) * len(sorted_r))) - 1, 0)
+    var_val = float(sorted_r.iloc[idx])
+    es = float(sorted_r.iloc[: idx + 1].mean()) if idx > 0 else var_val
     return {"var": round(var_val, 6), "expected_shortfall": round(es, 6), "method": "historical"}
 
 
@@ -20,8 +22,13 @@ def parametric_var(returns: pd.Series, confidence: float = 0.95) -> dict:
     """T096: Parametric (Gaussian) VaR."""
     from scipy import stats  # noqa: delayed import
 
-    mu = float(returns.mean())
-    sigma = float(returns.std())
+    clean = returns.dropna()
+    if len(clean) < 2:
+        return {"var": 0.0, "mu": 0.0, "sigma": 0.0, "method": "parametric"}
+    mu = float(clean.mean())
+    sigma = float(clean.std())
+    if sigma == 0:
+        return {"var": 0.0, "mu": round(mu, 6), "sigma": 0.0, "method": "parametric"}
     z = stats.norm.ppf(1 - confidence)
     var_val = mu + z * sigma
     return {"var": round(var_val, 6), "mu": round(mu, 6), "sigma": round(sigma, 6), "method": "parametric"}

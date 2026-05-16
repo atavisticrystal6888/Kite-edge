@@ -21,7 +21,7 @@ def _xnpv(rate: float, cashflows: Sequence[tuple[float, date]]) -> float:
     return sum(amount / (1.0 + rate) ** ((d - t0).days / 365.0) for amount, d in cashflows)
 
 
-def xirr(cashflows: Sequence[tuple[float, date]], *, guess_low: float = -0.99, guess_high: float = 10.0) -> float:
+def xirr(cashflows: Sequence[tuple[float, date]], *, guess_low: float = -0.9999, guess_high: float = 10.0) -> float:
     """Compute the internal rate of return for irregularly timed cashflows.
 
     Raises:

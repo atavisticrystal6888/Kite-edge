@@ -20,15 +20,19 @@ defmodule KiteEdgeWeb.WatchlistsController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    case Watchlists.update(id, params) do
+    user_id = conn.assigns.kite_session["user_id"]
+    case Watchlists.update(id, user_id, params) do
       {:ok, wl} -> json(conn, %{data: wl})
+      {:error, :not_found} -> conn |> put_status(404) |> json(%{error: "not_found"})
       {:error, cs} -> conn |> put_status(422) |> json(%{errors: format_errors(cs)})
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    case Watchlists.delete(id) do
+    user_id = conn.assigns.kite_session["user_id"]
+    case Watchlists.delete(id, user_id) do
       {:ok, _} -> send_resp(conn, 204, "")
+      {:error, :not_found} -> conn |> put_status(404) |> json(%{error: "not_found"})
       {:error, reason} -> conn |> put_status(422) |> json(%{error: reason})
     end
   end

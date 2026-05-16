@@ -7,6 +7,8 @@ defmodule KiteEdge.Watchlists do
     use Ecto.Schema
     import Ecto.Changeset
 
+    @derive {Jason.Encoder, only: [:id, :user_id, :name, :symbols, :sort_order, :inserted_at, :updated_at]}
+
     schema "watchlists" do
       field :user_id, :string
       field :name, :string
@@ -33,14 +35,17 @@ defmodule KiteEdge.Watchlists do
     |> Repo.insert()
   end
 
-  def update(id, attrs) do
-    Repo.get!(Watchlist, id)
-    |> Watchlist.changeset(attrs)
-    |> Repo.update()
+  def update(id, user_id, attrs) do
+    case Repo.get_by(Watchlist, id: id, user_id: user_id) do
+      nil -> {:error, :not_found}
+      wl -> wl |> Watchlist.changeset(attrs) |> Repo.update()
+    end
   end
 
-  def delete(id) do
-    Repo.get!(Watchlist, id)
-    |> Repo.delete()
+  def delete(id, user_id) do
+    case Repo.get_by(Watchlist, id: id, user_id: user_id) do
+      nil -> {:error, :not_found}
+      wl -> Repo.delete(wl)
+    end
   end
 end

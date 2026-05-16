@@ -6,7 +6,7 @@ const channels = new Map<string, Channel>()
 export function getSocket(): Socket {
   if (socket) return socket
   const url = (import.meta.env.VITE_GATEWAY_URL ?? 'http://localhost:4000').replace(/^http/, 'ws')
-  socket = new Socket(`${url}/socket`, { params: {} })
+  socket = new Socket(`${url}/socket`, { params: { token: document.cookie.match(/session_id=([^;]+)/)?.[1] ?? '' } })
   socket.connect()
   return socket
 }
@@ -18,6 +18,10 @@ export function joinChannel(topic: string, params: Record<string, unknown> = {})
   const s = getSocket()
   const ch = s.channel(topic, params)
   ch.join()
+    .receive('error', (resp) => {
+      console.error(`Failed to join channel ${topic}:`, resp)
+      channels.delete(topic)
+    })
   channels.set(topic, ch)
   return ch
 }

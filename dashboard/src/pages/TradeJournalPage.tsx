@@ -17,7 +17,7 @@ export function TradeJournalPage() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Trade Journal</h1>
       {isLoading && <p>Loading trades…</p>}
-      {data && <TradeHistory trades={[]} />}
+      {data && <TradeHistory trades={data.trades ?? []} />}
     </div>
   )
 }

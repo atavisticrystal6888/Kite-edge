@@ -40,12 +40,16 @@ class XIRRRequest(BaseModel):
 @app.post("/portfolio/xirr")
 async def portfolio_xirr(req: XIRRRequest):
     from datetime import date as _date
-    entries = [(c.amount, _date.fromisoformat(c.date)) for c in req.cashflows]
+    from fastapi.responses import JSONResponse
+    try:
+        entries = [(c.amount, _date.fromisoformat(c.date)) for c in req.cashflows]
+    except ValueError as e:
+        return JSONResponse(status_code=422, content={"error": f"Invalid date format: {e}", "xirr": None})
     try:
         result = xirr(entries)
         return {"xirr": result}
     except (ValueError, TypeError) as e:
-        return {"error": str(e), "xirr": None}
+        return JSONResponse(status_code=422, content={"error": str(e), "xirr": None})
 
 
 @app.get("/health")
