@@ -56,6 +56,9 @@ defmodule KiteEdge.MixProject do
       {:telemetry, "~> 1.2"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
+      # Error tracking
+      {:sentry, "~> 10.2"},
+      {:hackney, "~> 1.20"},
       # Optional email transport (wired by notification app, kept shared here)
       {:swoosh, "~> 1.16"},
       # Test helpers

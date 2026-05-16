@@ -6,3 +6,10 @@ config :kite_edge, KiteEdge.Repo,
   ssl: true
 
 config :logger, level: :info
+
+# Sentry error tracking (DSN set via SENTRY_DSN env var in runtime.exs)
+config :sentry,
+  included_environments: [:prod],
+  environment_name: :prod,
+  client: Sentry.HackneyClient,
+  filter: Sentry.DefaultEventFilter

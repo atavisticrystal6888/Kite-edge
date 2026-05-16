@@ -151,6 +151,21 @@ services:
     ports:
       - "5173:5173"
 
+  # Reverse proxy (production) — uncomment for TLS termination
+  # nginx:
+  #   image: nginx:1.27-alpine
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - gateway
+  #     - analytics_engine
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./infra/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - /etc/letsencrypt:/etc/letsencrypt:ro
+  #     - /var/www/certbot:/var/www/certbot:ro
+
 volumes:
   postgres_data:
   kafka_data:

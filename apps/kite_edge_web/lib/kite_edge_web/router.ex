@@ -9,6 +9,8 @@ defmodule KiteEdgeWeb.Router do
   pipeline :api_authed do
     plug :accepts, ["json"]
     plug KiteEdgeWeb.Plugs.SecurityHeaders
+    plug KiteEdgeWeb.Plugs.RateLimiter, limit: 60, window_ms: 60_000
+    plug KiteEdgeWeb.Plugs.VerifyOrigin
     plug KiteEdgeWeb.Plugs.RequireSession
   end
 
