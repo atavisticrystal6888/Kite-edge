@@ -7,10 +7,12 @@ set -euo pipefail
 BOOTSTRAP="${KAFKA_BOOTSTRAP:-kafka:9092}"
 REPLICATION="${KAFKA_REPLICATION_FACTOR:-1}"
 
+KAFKA_BIN="/opt/kafka/bin"
+
 topic() {
   local name="$1" partitions="$2" retention_ms="$3"
   echo "==> Ensuring topic ${name} (partitions=${partitions}, retention_ms=${retention_ms})"
-  kafka-topics.sh --bootstrap-server "${BOOTSTRAP}" \
+  "${KAFKA_BIN}/kafka-topics.sh" --bootstrap-server "${BOOTSTRAP}" \
     --create --if-not-exists \
     --topic "${name}" \
     --partitions "${partitions}" \
@@ -21,7 +23,7 @@ topic() {
 
 # Wait until the cluster is reachable.
 for i in $(seq 1 30); do
-  if kafka-topics.sh --bootstrap-server "${BOOTSTRAP}" --list >/dev/null 2>&1; then
+  if "${KAFKA_BIN}/kafka-topics.sh" --bootstrap-server "${BOOTSTRAP}" --list >/dev/null 2>&1; then
     break
   fi
   echo "Waiting for Kafka at ${BOOTSTRAP}..."
